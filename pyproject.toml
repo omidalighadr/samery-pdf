@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "samery-pdf"
+version = "0.1.0"
+description = "Merge PDFs and extract page ranges locally"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["pypdfium2>=5,<6"]
+
+[project.scripts]
+samery-pdf = "pdf_pages:main"
+
+[tool.setuptools]
+py-modules = ["pdf_pages"]
