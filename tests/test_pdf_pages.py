@@ -48,3 +48,22 @@ class PDFPagesTests(unittest.TestCase):
         with redirect_stderr(StringIO()):
             self.assertEqual(main(["merge", str(self.first), "-o", str(self.output)]), 1)
         self.assertEqual(self.output.read_bytes(), b"existing")
+
+    def test_invalid_later_input_keeps_sources_and_creates_no_output(self):
+        invalid = self.root / "invalid.pdf"
+        invalid.write_bytes(b"not a PDF")
+        first_before = self.first.read_bytes()
+        error = StringIO()
+
+        with redirect_stderr(error):
+            result = main(["merge", str(self.first), str(invalid), "-o", str(self.output)])
+
+        self.assertEqual(result, 1)
+        self.assertIn("Could not write PDF", error.getvalue())
+        self.assertFalse(self.output.exists())
+        self.assertEqual(self.first.read_bytes(), first_before)
+        self.assertEqual(invalid.read_bytes(), b"not a PDF")
+        self.assertEqual(
+            {path.name for path in self.root.iterdir()},
+            {"first.pdf", "second.pdf", "invalid.pdf"},
+        )
